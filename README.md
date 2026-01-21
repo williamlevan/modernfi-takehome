@@ -42,7 +42,7 @@ A web application for visualizing real-time US Treasury yield curves and amanagi
 ### Prerequisites
 - Node.js & npm
 - A FRED API key (get one free at https://fred.stlouisfed.org/docs/api/api_key.html)
-    - Alternatively, feel I can email you mine if you would prefer
+    - Alternatively, I can email you mine if you would prefer
 
 ### Setup
 1. **Install dependencies** (from the root directory)
