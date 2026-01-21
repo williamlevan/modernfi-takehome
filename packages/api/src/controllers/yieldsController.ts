@@ -4,8 +4,13 @@ import { YieldsResponse } from '@modernfi-takehome/shared';
 import { logger } from '../utils/logger';
 
 export const yieldsController = {
+  /**
+   * GET /api/yields
+   * Fetches treasury yield data from FRED API with fallback to cache
+   */
   getYields: async (req: Request, res: Response) => {
     try {
+      // Validate FRED API key configuration
       const apiKey = process.env.FRED_API_KEY;
 
       if (!apiKey) {
@@ -16,6 +21,7 @@ export const yieldsController = {
         });
       }
 
+      // Fetch yields from service (may use cache if API fails)
       const { yields, errors, fromCache } = await yieldsService.getAllYields(apiKey);
 
       // If we have no yields at all and have errors, treat as failure
@@ -28,17 +34,19 @@ export const yieldsController = {
         });
       }
 
+      // Log cache usage if applicable
       if (fromCache) {
         logger.warn('Returning cached yields data due to API failures');
       }
 
-      // Log warnings for partial failures
+      // Log warnings for partial failures (some terms failed but we have data)
       if (errors.length > 0 && !fromCache) {
         logger.warn(`Partial failure: ${errors.length} terms failed`, { errors });
       }
 
       logger.info(`Successfully fetched ${yields.length} yield data points${errors.length > 0 ? ` (${errors.length} errors)` : ''}`);
 
+      // Construct response with conditional error and cache flags
       const response: YieldsResponse = {
         success: true,
         data: yields,

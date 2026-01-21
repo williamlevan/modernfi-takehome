@@ -1,3 +1,8 @@
+/**
+ * Full-screen error modal component
+ * Displays error messages and provides a refresh/retry action
+ */
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -5,14 +10,18 @@ import styles from '../styles/components/ErrorModal.module.scss';
 
 interface ErrorModalProps {
     error: string | null;
-    onRetry?: () => void;
+    onRetry?: () => void; // Optional retry callback function
 }
 
 export default function ErrorModal({ error, onRetry }: ErrorModalProps) {
     const router = useRouter();
 
+    // Don't render if no error
     if (!error) return null;
 
+    /**
+     * Handles page refresh and optional retry callback
+     */
     const handleRefresh = () => {
         router.refresh();
         if (onRetry) {

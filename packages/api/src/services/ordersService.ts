@@ -2,8 +2,10 @@ import { Order } from '@modernfi-takehome/shared';
 import { logger } from '../utils/logger';
 import { TREASURY_SERIES } from '../constants/fredConstants';
 
+// In-memory storage for orders (data persists only during server runtime)
 const orders: Order[] = [];
 
+// Valid treasury terms derived from FRED series constants
 const VALID_TERMS = Object.keys(TREASURY_SERIES);
 
 interface OrderValidationError {
@@ -11,10 +13,14 @@ interface OrderValidationError {
   message: string;
 }
 
+/**
+ * Validates order data before creation
+ * Throws an error with validation details if any field is invalid
+ */
 function validateOrderData(orderData: Omit<Order, 'id' | 'created_at'>): void {
   const errors: OrderValidationError[] = [];
 
-  // Validate term
+  // Validate term (must be a valid treasury term)
   if (!orderData.term || typeof orderData.term !== 'string') {
     errors.push({ field: 'term', message: 'Term is required and must be a string' });
   } else if (!VALID_TERMS.includes(orderData.term)) {
@@ -24,7 +30,7 @@ function validateOrderData(orderData: Omit<Order, 'id' | 'created_at'>): void {
     });
   }
 
-  // Validate amount_in_cents
+  // Validate amount_in_cents (must be positive integer, max $10 billion)
   if (orderData.amount_in_cents === undefined || orderData.amount_in_cents === null) {
     errors.push({ field: 'amount_in_cents', message: 'Amount in cents is required' });
   } else if (typeof orderData.amount_in_cents !== 'number') {
@@ -37,7 +43,7 @@ function validateOrderData(orderData: Omit<Order, 'id' | 'created_at'>): void {
     errors.push({ field: 'amount_in_cents', message: 'Amount exceeds maximum allowed value' });
   }
 
-  // Validate rate_at_submission
+  // Validate rate_at_submission (must be between 0 and 100%)
   if (orderData.rate_at_submission === undefined || orderData.rate_at_submission === null) {
     errors.push({ field: 'rate_at_submission', message: 'Rate at submission is required' });
   } else if (typeof orderData.rate_at_submission !== 'number') {
@@ -50,7 +56,7 @@ function validateOrderData(orderData: Omit<Order, 'id' | 'created_at'>): void {
     errors.push({ field: 'rate_at_submission', message: 'Rate at submission cannot exceed 100%' });
   }
 
-  // Validate curve_date
+  // Validate curve_date (must be valid date, not in future, not older than 10 years)
   if (!orderData.curve_date) {
     errors.push({ field: 'curve_date', message: 'Curve date is required' });
   } else {
@@ -77,7 +83,7 @@ function validateOrderData(orderData: Omit<Order, 'id' | 'created_at'>): void {
     }
   }
 
-  // Validate series_id
+  // Validate series_id (must match expected FRED series ID for the term)
   if (!orderData.series_id || typeof orderData.series_id !== 'string') {
     errors.push({ field: 'series_id', message: 'Series ID is required and must be a string' });
   } else if (orderData.series_id.trim().length === 0) {
@@ -101,15 +107,21 @@ function validateOrderData(orderData: Omit<Order, 'id' | 'created_at'>): void {
 }
 
 export const orderService = {
+  /**
+   * Retrieves orders with pagination support
+   * Returns orders sorted by creation date (newest first)
+   */
   getOrdersPaginated: (page: number = 1, limit: number = 10): {
     orders: Order[];
     total: number;
     total_pages: number;
   } => {
+    // Sort orders by creation date (newest first)
     const sortedOrders = [...orders].sort((a, b) =>
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
 
+    // Calculate pagination metadata
     const total = sortedOrders.length;
     const totalPages = Math.ceil(total / limit);
     const startIndex = (page - 1) * limit;
@@ -123,10 +135,15 @@ export const orderService = {
     };
   },
 
+  /**
+   * Creates a new order after validation
+   * Generates a unique ID and timestamp
+   */
   createOrder: (orderData: Omit<Order, 'id' | 'created_at'>): Order => {
-
+    // Validate all order fields before creation
     validateOrderData(orderData);
 
+    // Generate unique order ID with timestamp and random suffix
     const newOrder: Order = {
       id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       created_at: new Date(),
@@ -139,6 +156,10 @@ export const orderService = {
     return newOrder;
   },
 
+  /**
+   * Finds an existing order by idempotency key
+   * Used to prevent duplicate order creation
+   */
   findOrderByIdempotencyKey: (idempotencyKey: string): Order | undefined => {
     const order = orders.find(
       order => (order as any).idempotencyKey === idempotencyKey
