@@ -1,0 +1,21 @@
+{
+    "name": "modernfi-takehome",
+    "version": "1.0.0",
+    "private": true,
+    "author": "Will LeVan <williamelylevan@gmail.com>",
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "dev": "concurrently \"npm run dev --workspace=@modernfi-takehome/shared\" \"npm run dev --workspace=@modernfi-takehome/api\" \"npm run dev --workspace=@modernfi-takehome/web\"",
+        "dev:web": "npm run dev --workspace=@modernfi-takehome/web",
+        "dev:api": "npm run dev --workspace=@modernfi-takehome/api",
+        "dev:shared": "npm run dev --workspace=@modernfi-takehome/shared",
+        "build": "npm run build --workspaces",
+        "test": "npm run test --workspaces"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2",
+        "typescript": "^5.3.0"
+    }
+}

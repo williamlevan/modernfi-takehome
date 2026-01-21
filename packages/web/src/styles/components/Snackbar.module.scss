@@ -1,0 +1,75 @@
+@use '../variables' as *;
+
+.snackbar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    min-width: 300px;
+    max-width: 500px;
+    z-index: 10000;
+    animation: slideUp 0.3s ease-out;
+
+    @keyframes slideUp {
+        from {
+            transform: translateX(-50%) translateY(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    }
+}
+
+// Use kebab-case to match the component's usage
+.snackbarSuccess {
+    background: $success-color !important;
+    color: white !important;
+}
+
+.snackbarError {
+    background: $error-color !important;
+    color: white !important;
+}
+
+.snackbarMessage {
+    flex: 1;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.snackbarClose {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    &:active {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    svg {
+        width: 20px;
+        height: 20px;
+    }
+}

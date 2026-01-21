@@ -1,0 +1,111 @@
+@use '../variables' as *;
+
+.orderHistory {
+    width: 100%;
+    background: $bg-color;
+    border-radius: 8px;
+    padding: 1.5rem;
+    @include card-shadow;
+    height: 650px;
+    display: flex;
+    flex-direction: column;
+
+    .title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: $text-color;
+    }
+
+    .loading,
+    .error,
+    .empty {
+        text-align: center;
+        padding: 2rem;
+        color: $secondary-color;
+    }
+
+    .error {
+        color: $error-color;
+    }
+
+    .tableContainer {
+        overflow-x: auto;
+        margin-bottom: 1rem;
+        // height: 460px;
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+
+            thead {
+                background: #f9fafb;
+                border-bottom: 2px solid $border-color;
+            }
+
+            th {
+                padding: 0.75rem;
+                text-align: left;
+                font-weight: 600;
+                color: $text-color;
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            tbody {
+                tr {
+                    border-bottom: 1px solid $border-color;
+                    transition: background-color 0.2s;
+
+                    &:hover {
+                        background: #f9fafb;
+                    }
+                }
+
+                td {
+                    padding: 0.75rem;
+                    color: $text-color;
+                }
+            }
+        }
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid $border-color;
+        margin-top: auto;
+
+        .paginationButton {
+            padding: 0.5rem 1rem;
+            background: $primary-color;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+
+            &:hover:not(:disabled) {
+                background: darken($primary-color, 10%);
+            }
+
+            &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+        }
+
+        .paginationInfo {
+            font-size: 0.875rem;
+            color: $secondary-color;
+        }
+    }
+}

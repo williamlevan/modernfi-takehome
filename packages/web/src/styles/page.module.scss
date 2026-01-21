@@ -1,0 +1,26 @@
+@use './variables' as *;
+
+.main {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+
+    .section {
+        margin-bottom: 2rem;
+    }
+
+    .twoColumn {
+        display: flex;
+        gap: 1.5rem;
+        width: 100%;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+        }
+
+        .column {
+            flex: 1;
+            min-width: 0;
+        }
+    }
+}

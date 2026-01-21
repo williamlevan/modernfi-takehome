@@ -1,0 +1,61 @@
+@use '../variables' as *;
+
+.yieldCurveChart {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+
+    @media (max-width: 768px) {
+        padding: 1rem;
+    }
+
+    .container {
+        width: 80%; // Set to exactly 80% of parent
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .chartContainer {
+            width: 100%;
+            background: $bg-color;
+            border-radius: 8px;
+            padding: 1.5rem;
+            @include card-shadow;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: visible;
+
+            @media (max-width: 768px) {
+                padding: 1rem;
+            }
+
+            svg {
+                display: block;
+                width: 100%;
+                height: auto;
+                min-width: 400px;
+                overflow: visible;
+            }
+
+            :global {
+                .grid line {
+                    stroke: $border-color;
+                    stroke-dasharray: 2, 2;
+                    opacity: 0.5;
+                }
+
+                .dot {
+                    cursor: pointer;
+                    transition: r 0.2s ease;
+
+                    &:hover {
+                        r: 7;
+                    }
+                }
+            }
+        }
+    }
+}
