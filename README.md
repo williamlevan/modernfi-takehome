@@ -57,7 +57,7 @@ A web application for visualizing real-time US Treasury yield curves and amanagi
 ### Running the Application
 
 **Option 1: Run everything together** (recommended):
-    npm run dev
+    <npm run dev>
     
 This will start:
 - Shared package (TypeScript compilation)
