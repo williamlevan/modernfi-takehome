@@ -5,9 +5,9 @@ A web application for visualizing real-time US Treasury yield curves and amanagi
 ### Assumptions
 1. Yield data meaning: "Treasury yields" refers to the US Treasury/Federal Reserve's published yield curve rates by maturity (1M, 3M, 6M, 1Y, ... 30Y). This app visualizes a singles day's curve with the most recent available data.
 2. Data source reliability: The data presented by the US Treasury here [https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?field_tdr_date_value=2026&type=daily_treasury_yield_curve&utm_source=chatgpt.com] seems to match the data provided by the FRED API. For live data, I chose to pull data from the FRED API. If the upstream source is temporarily unavailable, the API returns a clear error and the UI shows an error state.
-3. Order definition: An "order" in this application is a symbolic intent to allocate liquidity to a chosen maturity for a user-provided dollar amount at a specific rate (provided from the yield rate for the most recent data upon submission). This value is stored as <rate_at_submission>.
+3. Order definition: An "order" in this application is a symbolic intent to allocate liquidity to a chosen maturity for a user-provided dollar amount at a specific rate (provided from the yield rate for the most recent data upon submission). This value is stored as `rate_at_submission`.
 4. Single-user / no auth: The app assumes a single local user and does not provide authentication. "User's historical orders" means the historical orders created in the running local instance.
-5. Currency: Amounts are assumed to be USD. No multi-currency handling is provided and amounts are stored as <amount_in_cents>.
+5. Currency: Amounts are assumed to be USD. No multi-currency handling is provided and amounts are stored as `amount_in_cents`.
 
 ### In Scope
 - Pulling up-to-date treasury yield data from the Federal Reserve Economic Data (FRED) API.
@@ -46,18 +46,18 @@ A web application for visualizing real-time US Treasury yield curves and amanagi
 
 ### Setup
 1. **Install dependencies** (from the root directory)
-    npm install
+    `npm install`
 2. **Configure environment variables**
     Create a `.env` file in `packages/api/` with your FRED API key:
-    FRED_API_KEY=your_fred_api_key_here
-    PORT=3001  # Optional, defaults to 3001
-    NODE_ENV=development #Optional
+    `FRED_API_KEY=your_fred_api_key_here`
+    `PORT=3001`  # Optional, defaults to 3001
+    `NODE_ENV=development` #Optional
 3. **Build shared workspace
 
 ### Running the Application
 
 **Option 1: Run everything together** (recommended):
-    <npm run dev>
+    `npm run dev`
     
 This will start:
 - Shared package (TypeScript compilation)
@@ -66,10 +66,10 @@ This will start:
 
 **Option 2: Run packages individually:**
 # Terminal 1 - API server
-npm run dev:api
+`npm run dev:api`
 
 # Terminal 2 - Web application
-npm run dev:web
+`npm run dev:web`
 
 ### Testing the Application
 
