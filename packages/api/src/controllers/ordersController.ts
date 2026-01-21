@@ -4,11 +4,16 @@ import { Order, OrdersResponse } from '@modernfi-takehome/shared';
 import { logger } from '../utils/logger';
 
 export const orderController = {
+  /**
+ * GET /api/orders
+ * Fetches paginated list of orders
+ */
   getOrders: (req: Request, res: Response) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
+      // Validate page parameter
       if (page < 1) {
         logger.warn(`Invalid page parameter: ${page}`);
         return res.status(400).json({
@@ -50,13 +55,19 @@ export const orderController = {
     }
   },
 
+  /**
+ * POST /api/orders
+ * Creates a new order with idempotency support via Idempotency-Key header
+ */
   createOrder: (req: Request, res: Response) => {
     try {
+      // Extract idempotency key from headers (checked by middleware)
       const idempotencyKey = req.headers['idempotency-key'] as string;
       const orderData = req.body;
 
       logger.info('Creating new order', { term: orderData.term, amount: orderData.amount_in_cents });
 
+      // Check if order already exists (idempotency check)
       const existingOrder = orderService.findOrderByIdempotencyKey(idempotencyKey);
 
       if (existingOrder) {
@@ -68,6 +79,7 @@ export const orderController = {
         });
       }
 
+      // Extract and validate required fields
       const { curve_date, term, amount_in_cents, rate_at_submission, series_id } = orderData;
 
       if (!curve_date || !term || !series_id || amount_in_cents === undefined || rate_at_submission === undefined) {
@@ -78,6 +90,7 @@ export const orderController = {
         });
       }
 
+      // Create new order via service layer
       const newOrder = orderService.createOrder({
         curve_date: new Date(curve_date),
         term,
@@ -95,7 +108,7 @@ export const orderController = {
     } catch (error) {
       logger.error('Failed to create order', error);
 
-      // Check if it's a validation error
+      // Handle validation errors from service layer
       if (error instanceof Error && error.message.startsWith('Validation failed:')) {
         return res.status(400).json({
           success: false,

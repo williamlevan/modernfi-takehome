@@ -1,3 +1,8 @@
+/**
+ * Main page component displaying yield curve chart, order submission, and order history
+ * Manages yields data fetching and coordinates loading/error states
+ */
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -17,16 +22,22 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const { loading: ordersLoading } = useOrders();
 
+  /**
+   * Fetches treasury yield data from the API
+   * Transforms date fields to ensure proper Date object handling
+   */
   const loadYields = async () => {
     try {
       setYieldsLoading(true);
       const result: YieldsResponse = await fetchYields();
       if (result.success) {
+        // Ensure dates are Date objects (handle both Date and string formats)
         const transformedData = result.data.map(yieldData => ({
           ...yieldData,
           date: yieldData.date instanceof Date ? yieldData.date : new Date(yieldData.date),
         }));
         setYieldsData(transformedData);
+        setError(null); // Clear any previous errors on success
       } else {
         setError('Failed to fetch yields data');
       }
@@ -37,6 +48,7 @@ export default function Home() {
     }
   };
 
+  // Load yields data on component mount
   useEffect(() => {
     loadYields();
   }, []);
@@ -46,14 +58,19 @@ export default function Home() {
 
   return (
     <>
+      {/* Full-screen modals for loading and error states */}
       <LoadingModal isLoading={isLoading} />
       <ErrorModal error={error} onRetry={loadYields} />
+      
       <main className={styles.main}>
+        {/* Yield curve chart section */}
         <div className={styles.section}>
           {!error && (
             <YieldCurveChart yieldsData={yieldsData} width={900} height={500} />
           )}
         </div>
+        
+        {/* Two-column layout for order submission and history */}
         <div className={styles.twoColumn}>
           <div className={styles.column}>
             <OrderSubmission yieldsData={yieldsData} />

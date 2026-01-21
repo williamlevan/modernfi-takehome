@@ -1,3 +1,8 @@
+/**
+ * Component for submitting new treasury orders
+ * Allows users to select a term, enter an amount, and submit orders with current yield rates
+ */
+
 'use client';
 
 import { useState } from 'react';
@@ -19,25 +24,34 @@ export default function OrderSubmission({ yieldsData }: OrderSubmissionProps) {
     const { showSnackbar } = useSnackbar();
     const { refreshOrders } = useOrders();
 
+    // Filter available terms to only those with yield data
     const availableTerms = TERM_ORDER.filter(term =>
         yieldsData.some(yieldData => yieldData.term === term)
     );
 
+    // Get yield data for selected term
     const selectedYield = yieldsData.find(y => y.term === selectedTerm);
     const rate = selectedYield?.value ?? 0;
     const curveDate = selectedYield?.date ?? new Date();
     const seriesId = selectedYield?.series_id ?? '';
 
+    /**
+     * Handles form submission and order creation
+     * Validates input, converts amount to cents, and submits order
+     */
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        // Validate required fields
         if (!selectedTerm || !amount) {
             showSnackbar('Please select a term and enter an amount', 'error');
             return;
         }
 
+        // Convert dollar amount to cents
         const amountInCents = Math.round(parseFloat(amount) * 100);
 
+        // Validate amount is a valid positive number
         if (isNaN(amountInCents) || amountInCents <= 0) {
             showSnackbar('Please enter a valid amount', 'error');
             return;
@@ -50,10 +64,10 @@ export default function OrderSubmission({ yieldsData }: OrderSubmissionProps) {
 
             if (result.success) {
                 showSnackbar('Order submitted successfully!', 'success');
-                // Reset form
+                // Reset form after successful submission
                 setSelectedTerm('');
                 setAmount('');
-                refreshOrders();
+                refreshOrders(); // Refresh order history to show new order
             } else {
                 showSnackbar(result.error || 'Failed to submit order', 'error');
             }
@@ -68,6 +82,7 @@ export default function OrderSubmission({ yieldsData }: OrderSubmissionProps) {
         <div className={styles.orderSubmission}>
             <h2 className={styles.title}>Submit Order</h2>
             <form onSubmit={handleSubmit} className={styles.form}>
+                {/* Term selection dropdown */}
                 <div className={styles.formGroup}>
                     <label htmlFor="term" className={styles.label}>
                         Term
@@ -88,6 +103,7 @@ export default function OrderSubmission({ yieldsData }: OrderSubmissionProps) {
                     </select>
                 </div>
 
+                {/* Amount input */}
                 <div className={styles.formGroup}>
                     <label htmlFor="amount" className={styles.label}>
                         Amount ($)
@@ -105,6 +121,7 @@ export default function OrderSubmission({ yieldsData }: OrderSubmissionProps) {
                     />
                 </div>
 
+                {/* Display rate and date info when term is selected */}
                 {selectedTerm && (
                     <div className={styles.infoGroup}>
                         <div className={styles.infoRow}>
@@ -124,6 +141,7 @@ export default function OrderSubmission({ yieldsData }: OrderSubmissionProps) {
                     </div>
                 )}
 
+                {/* Submit button (disabled during submission or when form is invalid) */}
                 <button
                     type="submit"
                     disabled={isSubmitting || !selectedTerm || !amount}

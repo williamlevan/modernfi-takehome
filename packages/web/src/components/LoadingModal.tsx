@@ -1,3 +1,8 @@
+/**
+ * Full-screen loading modal component
+ * Displays a spinner and loading message while data is being fetched
+ */
+
 'use client';
 
 import { ClipLoader } from 'react-spinners';
@@ -8,6 +13,7 @@ interface LoadingModalProps {
 }
 
 export default function LoadingModal({ isLoading }: LoadingModalProps) {
+    // Don't render if not loading
     if (!isLoading) return null;
 
     return (

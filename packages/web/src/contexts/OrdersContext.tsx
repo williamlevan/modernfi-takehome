@@ -1,9 +1,17 @@
+/**
+ * React Context for managing orders state across the application
+ * Provides orders data, pagination, loading states, and refresh functionality
+ */
+
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { Order, OrdersResponse } from '@modernfi-takehome/shared';
 import { fetchOrders } from '../server';
 
+/**
+ * Type definition for the Orders context value
+ */
 interface OrdersContextType {
     orders: Order[];
     pagination: {
@@ -20,6 +28,10 @@ interface OrdersContextType {
 
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
 
+/**
+ * Hook to access the Orders context
+ * Throws an error if used outside of OrdersProvider
+ */
 export function useOrders() {
     const context = useContext(OrdersContext);
     if (!context) {
@@ -32,6 +44,9 @@ interface OrdersProviderProps {
     children: ReactNode;
 }
 
+/**
+ * Provider component that manages orders state and provides it to child components
+ */
 export function OrdersProvider({ children }: OrdersProviderProps) {
     const [orders, setOrders] = useState<Order[]>([]);
     const [pagination, setPagination] = useState({
@@ -43,6 +58,10 @@ export function OrdersProvider({ children }: OrdersProviderProps) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    /**
+     * Fetches orders from the API and transforms date fields
+     * Ensures curve_date is stored as date-only (no time component)
+     */
     const loadOrders = useCallback(async (page: number = 1) => {
         try {
             setLoading(true);
@@ -50,6 +69,7 @@ export function OrdersProvider({ children }: OrdersProviderProps) {
             const result: OrdersResponse = await fetchOrders(page, pagination.limit);
 
             if (result.success) {
+                // Transform orders to ensure proper date parsing
                 const transformedOrders = result.data.map(order => {
                     // Parse curve_date to date-only (no time)
                     let curveDate: Date;
@@ -76,6 +96,7 @@ export function OrdersProvider({ children }: OrdersProviderProps) {
                 });
 
                 setOrders(transformedOrders);
+                // Update pagination state (map total_pages from API response)
                 setPagination({
                     page: result.pagination.page,
                     limit: result.pagination.limit,
@@ -92,14 +113,21 @@ export function OrdersProvider({ children }: OrdersProviderProps) {
         }
     }, [pagination.limit]);
 
+    /**
+     * Refreshes orders for the current page
+     */
     const refreshOrders = useCallback(async () => {
         await loadOrders(pagination.page);
     }, [loadOrders, pagination.page]);
 
+    /**
+     * Changes the current page and loads orders for that page
+     */
     const setPage = useCallback((page: number) => {
         loadOrders(page);
     }, [loadOrders]);
 
+    // Load orders on initial mount
     useEffect(() => {
         loadOrders(1);
     }, []);
