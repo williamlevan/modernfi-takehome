@@ -28,7 +28,7 @@ A web application for visualizing real-time US Treasury yield curves and amanagi
 - Other stuff such as accessibility, mobile-first design, rigorous testing, CI/CD, monitoring, WebSocket-powered real-time updates, dynamic charts with zooming as well as historical chart data were all deemed out of scope for this application.
 
 ### Looking Ahead
-- See what was not completed above in Out of Scope. These are the things that I would prioritize in pushing a product like this to production improving/widening its features.
+- See what was not completed above in Out of Scope. These are the things that I would prioritize in pushing a product like this to production and improving/widening its features.
 
 ### Technical Stack
 **Frontend**: Next.js, React, TypeScript, D3.js, SCSS  
